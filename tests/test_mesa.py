@@ -124,7 +124,7 @@ def test_revision_de_github_actions_atiende_y_confirma(monkeypatch):
 
 
 def test_revision_sin_token_termina_sin_error(monkeypatch, capsys):
-    """Una copia de la plantilla sin Secrets no debe marcar error en Actions cada 10 minutos."""
+    """Una copia de la plantilla sin Secrets no debe marcar error en Actions cada 8 minutos."""
     import revisar_telegram as rt
     monkeypatch.setattr(config, "TELEGRAM_BOT_TOKEN", "")
     rt.main()
@@ -139,3 +139,40 @@ def test_los_agentes_se_presentan_con_su_nombre():
     for nombre in ("Batuta", "Iris", "Euler", "Vera"):
         assert nombre in texto
     assert r["entrega_3_nota"].startswith(agentes.FIRMA_VERA)
+
+
+# ---------------------------------------------------------------------------
+# Pruebas nuevas: personalidad de Vera y recomendaciones de seguridad
+# ---------------------------------------------------------------------------
+def test_vera_narradora_conserva_las_reglas():
+    """La personalidad cambió, pero la nota sigue con firma, aviso DEMO y descargo."""
+    r = pl.pipeline("AAPL", avisar=lambda t: None)
+    nota = r["entrega_3_nota"]
+    assert nota.startswith("🎙️ Vera · La Narradora")
+    assert "DEMO" in nota and "partido" in nota
+    assert nota.endswith(agentes.DESCARGO)
+    assert "Narradora" in agentes.PROMPT_COMUNICADOR and "compra" in agentes.PROMPT_COMUNICADOR
+
+
+def test_sin_chat_id_el_bot_no_atiende_a_nadie(monkeypatch):
+    """Cerrado por defecto: sin TELEGRAM_CHAT_ID nadie puede gastar las llaves."""
+    enviados = []
+    monkeypatch.setattr(comandos, "enviar", lambda chat, texto: enviados.append(texto))
+    monkeypatch.setattr(config, "TELEGRAM_CHAT_ID", "")
+    assert comandos.atender({"chat": {"id": 999}, "text": "/analiza AAPL"}) is None
+    assert enviados == ["Este bot es privado."]
+
+
+def test_mensaje_largo_se_ignora(monkeypatch):
+    enviados = []
+    monkeypatch.setattr(comandos, "enviar", lambda chat, texto: enviados.append(texto))
+    monkeypatch.setattr(config, "TELEGRAM_CHAT_ID", "111")
+    assert comandos.atender({"chat": {"id": 111}, "text": "/analiza AAPL " + "x" * 200}) is None
+    assert "demasiado largo" in enviados[-1]
+
+
+def test_los_errores_no_muestran_llaves(monkeypatch):
+    monkeypatch.setattr(config, "TELEGRAM_BOT_TOKEN", "123456:TOKEN-SECRETO-DE-PRUEBA")
+    error = ConnectionError("https://api.telegram.org/bot123456:TOKEN-SECRETO-DE-PRUEBA/getUpdates")
+    limpio = config.ocultar_llaves(error)
+    assert "TOKEN-SECRETO" not in limpio and "***" in limpio
