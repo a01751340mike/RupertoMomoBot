@@ -42,7 +42,7 @@ def pipeline(ticker, avisar=print, guardar=True):
         avisar("📦 Entrega 2→3 · Euler → Vera (indicadores):\n"
                + json.dumps(analisis["indicadores"], ensure_ascii=False, indent=1))
 
-    avisar("✍️ Vera · Comunicadora redactando la nota…")
+    avisar("🎙️ Vera · La Narradora calentando para narrar la nota…")
     nota = agente_comunicador(analisis)
 
     resultado = {

@@ -32,7 +32,21 @@ MODO_CLASE = _bandera("MODO_CLASE", "1")                  # 1 = muestra cada ent
 MODO_SIMULACION = _bandera("MODO_SIMULACION") or not (ANTHROPIC_API_KEY and ALPHAVANTAGE_API_KEY)
 
 MAX_ANALISIS_POR_RUN = int(_texto("MAX_ANALISIS_POR_RUN", "3"))   # cuida la cuota de Alpha Vantage
+MAX_LARGO_MENSAJE = 40          # SEGURIDAD: un /analiza nunca necesita más; textos largos se ignoran
 CARPETA_SALIDAS = _texto("CARPETA_SALIDAS", "salidas")
+
+
+def ocultar_llaves(texto):
+    """SEGURIDAD: borra cualquier llave que se cuele en un mensaje de error antes de imprimirlo.
+
+    Ejemplo: un error de conexión de requests trae la URL completa, y la URL de Telegram
+    lleva el token adentro. Sin esto, el token podría quedar en los registros de Actions.
+    """
+    texto = str(texto)
+    for llave in (TELEGRAM_BOT_TOKEN, ANTHROPIC_API_KEY, ALPHAVANTAGE_API_KEY):
+        if llave and len(llave) >= 8:
+            texto = texto.replace(llave, "***")
+    return texto
 
 
 def resumen():

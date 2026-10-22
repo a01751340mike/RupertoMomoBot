@@ -2,7 +2,9 @@
 
   Iris  · La Recolectora  (Agente 1) → consulta Alpha Vantage por MCP y entrega una FICHA (JSON)
   Euler · El Analista     (Agente 2) → recibe la ficha, Python calcula y Claude interpreta → ANÁLISIS (JSON)
-  Vera  · La Comunicadora (Agente 3) → recibe el análisis y redacta la NOTA final para Telegram
+  Vera  · La Narradora   (Agente 3) → recibe el análisis y narra la NOTA final para Telegram
+                                       (personalidad cambiada: antes "Comunicadora" seria y breve,
+                                        ahora narradora deportiva que explica el mercado como un partido)
   (Batuta, el orquestador que los dirige, vive en mesa/pipeline.py)
 
 Regla de oro: los números los calcula el código; la IA solo interpreta.
@@ -12,7 +14,7 @@ import json
 from . import config
 
 DESCARGO = "Nota educativa, no es recomendación de inversión."
-FIRMA_VERA = "✍️ Vera · Comunicadora"
+FIRMA_VERA = "🎙️ Vera · La Narradora"
 
 # ----------------------------------------------------------------------
 # Conexión con Claude (solo se usa fuera del modo simulación)
@@ -171,13 +173,18 @@ def agente_analista(ficha):
 
 
 # ----------------------------------------------------------------------
-# VERA · La Comunicadora (Agente 3)
+# VERA · La Narradora (Agente 3)
 # ----------------------------------------------------------------------
-PROMPT_COMUNICADOR = f"""Eres Vera, la Comunicadora (Agente 3). Con el análisis de Euler, redacta una nota para Telegram.
-Tu personalidad: clara, breve y honesta sobre los límites del análisis.
+PROMPT_COMUNICADOR = f"""Eres Vera, la Narradora (Agente 3). Con el análisis de Euler, narra una nota para Telegram.
+Tu personalidad: narradora deportiva de fútbol. Cuentas lo que pasa con la acción como si fuera
+un partido en vivo: con energía y metáforas de fútbol (el precio es el marcador, la beta es qué tan
+"picado" está el partido, el rango de 52 semanas es la tabla de la temporada).
+La emoción NUNCA cambia los datos: eres honesta sobre los límites del análisis.
 - Máximo 900 caracteres, español claro, 3 a 5 emojis como máximo.
-- Estructura: título con ticker · cifras clave · semáforo de riesgo · interpretación · pregunta para investigar.
-- Usa solo las cifras recibidas; si la fuente dice DEMO, adviértelo en la primera línea.
+- Estructura: grito de apertura con el ticker · marcador (cifras clave) · qué tan picado está (semáforo de riesgo) ·
+  lectura del partido (interpretación) · la jugada a revisar (pregunta para investigar).
+- Usa solo las cifras recibidas, sin redondearlas ni inventar otras; si la fuente dice DEMO, adviértelo en la primera línea.
+- Nunca digas "compra" o "vende" ni prometas resultados.
 - Cierra SIEMPRE con: "{DESCARGO}"
 Texto plano, sin Markdown."""
 
@@ -185,12 +192,12 @@ Texto plano, sin Markdown."""
 def nota_simulada(analisis):
     f, ind, lec = analisis["ficha"], analisis["indicadores"], analisis["lectura"]
     return (f"{FIRMA_VERA}\n⚠️ {f['fuente']}\n"
-            f"📊 {f['ticker']} · {f['nombre']}\n"
-            f"Precio: {f['precio']} USD ({ind['cambio_pct']} % en el día)\n"
-            f"Riesgo: {ind['semaforo_beta']} (beta {ind['beta']})\n"
-            f"{lec['lectura_precio']}\n"
+            f"⚽ ¡Arranca el partido para {f['ticker']} · {f['nombre']}!\n"
+            f"Marcador: {f['precio']} USD ({ind['cambio_pct']} % en el día)\n"
+            f"¿Qué tan picado está? {ind['semaforo_beta']} (beta {ind['beta']})\n"
+            f"Lectura del partido: {lec['lectura_precio']}\n"
             f"{lec['lectura_valuacion']}\n"
-            f"🔎 {lec['pregunta_para_investigar']}\n\n{DESCARGO}")
+            f"🔎 La jugada a revisar: {lec['pregunta_para_investigar']}\n\n{DESCARGO}")
 
 
 def agente_comunicador(analisis):

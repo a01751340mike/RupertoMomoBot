@@ -1,10 +1,11 @@
 """Interpreta los mensajes que el alumno escribe en Telegram (lo comparten el bot continuo y GitHub Actions)."""
+from . import config
 from .pipeline import normalizar_ticker, pipeline
 from .telegram_io import chat_autorizado, enviar
 
 AYUDA = ("🤖 Mesa Financiera de 3 agentes\n"
          "/analiza TICKER → ejemplo: /analiza AAPL\n"
-         "Batuta dirige: Iris (datos por MCP) → Euler (análisis) → Vera (nota)\n"
+         "Batuta dirige: Iris (datos por MCP) → Euler (análisis) → Vera (narra la nota)\n"
          "Límite gratuito de Alpha Vantage: 25 consultas al día.")
 
 
@@ -19,6 +20,9 @@ def atender(mensaje):
 
     if not chat_autorizado(chat_id):
         enviar(chat_id, "Este bot es privado.")
+        return None
+    if len(texto) > config.MAX_LARGO_MENSAJE:           # SEGURIDAD: no se procesan textos largos
+        enviar(chat_id, "Mensaje demasiado largo. Ejemplo correcto: /analiza AAPL")
         return None
     if not es_analisis(texto):
         enviar(chat_id, AYUDA)
