@@ -7,7 +7,7 @@ un ecosistema de **3 agentes financieros** que se pasan el trabajo en cadena y s
 Telegram /analiza AAPL ─► Batuta · Orquestador (mesa/pipeline.py)
    ├─ Iris  · Recolectora  (Agente 1: Claude + MCP de Alpha Vantage) ─► ficha JSON
    ├─ Euler · Analista     (Agente 2: Python calcula, Claude interpreta) ─► análisis JSON
-   └─ Vera  · Comunicadora (Agente 3: Claude redacta) ─► nota final en Telegram
+   └─ Vera  · Narradora    (Agente 3: Claude narra como partido de fútbol) ─► nota final en Telegram
 ```
 
 Usa siempre estos nombres (Batuta, Iris, Euler, Vera) al explicar el sistema: coinciden con el mockup y con las guías.
@@ -51,5 +51,5 @@ Cuando te pidan ejecutar o probar la actividad, sigue este orden y reporta cada 
 ## Estructura
 - `mesa/config.py` llaves y modos · `mesa/agentes.py` los 3 agentes · `mesa/pipeline.py` el orquestador
 - `mesa/telegram_io.py` Bot API · `mesa/comandos.py` interpreta `/analiza`
-- `revisar_telegram.py` lo usa GitHub Actions cada 10 minutos (funciona con la computadora apagada)
+- `revisar_telegram.py` lo usa GitHub Actions cada 8 minutos (funciona con la computadora apagada)
 - `.github/workflows/` automatizaciones · `tests/` pruebas en simulación

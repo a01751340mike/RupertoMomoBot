@@ -9,7 +9,7 @@ Tú das la orden desde **Telegram**, **Batuta** (el orquestador) dirige y tres e
 |---|---|---|
 | **Iris** · La Recolectora | Curiosa y meticulosa; jamás inventa un dato | Consulta datos reales de Alpha Vantage por MCP |
 | **Euler** · El Analista | Riguroso con los números | Python calcula; Claude interpreta |
-| **Vera** · La Comunicadora | Clara, breve y honesta | Redacta la nota final para Telegram |
+| **Vera** · La Narradora ⚽ | Narradora de fútbol: con energía, pero honesta con los datos | Narra la nota final para Telegram como si fuera un partido |
 
 ```
 Tú en Telegram: /analiza AAPL
@@ -19,8 +19,19 @@ Tú en Telegram: /analiza AAPL
         │
         ├─► Iris  · Recolectora ── consulta Alpha Vantage por MCP ──► ficha JSON
         ├─► Euler · Analista ───── Python calcula, Claude interpreta ─► análisis JSON
-        └─► Vera  · Comunicadora ─ redacta la nota ───────────────────► mensaje en Telegram
+        └─► Vera  · Narradora ──── narra la nota ─────────────────────► mensaje en Telegram
 ```
+
+## Cambios de mi entrega (Miguel Ángel Morales Azamar)
+
+| # | Cambio pedido | Qué hice |
+|---|---|---|
+| 1 | LLM | Ya usaba la API de Claude (Anthropic), modelo `claude-haiku-5-5`. Sin cambio. |
+| 2 | Personalidad | **Vera** pasó de "Comunicadora" seria a **"Narradora"** que cuenta la acción como un partido de fútbol. Solo cambió su forma de hablar; las cifras y el descargo siguen igual. Ver `mesa/agentes.py`. |
+| 3 | Cron | De cada 10 minutos a **cada 8 minutos** (`*/8 * * * *`). Ver `.github/workflows/mesa-financiera.yml`. |
+| 4 | Seguridad | Pedí recomendaciones de seguridad y apliqué las que se pueden hacer en código. Lista completa en **[SEGURIDAD.md](SEGURIDAD.md)**. |
+
+Pruebas automáticas: **24** (antes 20), todas en verde.
 
 ## Paso cero: crea tu propia copia
 
